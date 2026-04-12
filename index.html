@@ -579,10 +579,9 @@
 <div class="toast" id="toast"></div>
 
 <script>
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTjk9f0yF52-EYm14I3pTQbsZo881GzMOGHswjKGhqhNo6dnkus2pxN0RkMyrslVwFFJ9r6ljYBSciC/pub?gid=75747372&single=true&output=csv';
 const SHEET_ID = '1tgboSBfdyyHw8IbDhtwOzjZR8DBGIAYmTcQv8UIv5FM';
 const SHEET_NAME = 'Sheet1';
-const BASE_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
-const WRITE_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/values/${SHEET_NAME}`;
 
 let allRestos = [];
 let filtered = [];
@@ -592,22 +591,39 @@ let map = null;
 let mapInitialized = false;
 let currentTab = 'list';
 
+function parseCSV(text) {
+  const lines = [];
+  let cur = '', inQuote = false;
+  const cells = [], rows = [[]];
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === '"') { inQuote = !inQuote; }
+    else if (ch === ',' && !inQuote) { rows[rows.length-1].push(cur); cur = ''; }
+    else if ((ch === '\n' || ch === '\r') && !inQuote) {
+      rows[rows.length-1].push(cur); cur = '';
+      if (ch === '\r' && text[i+1] === '\n') i++;
+      rows.push([]);
+    } else { cur += ch; }
+  }
+  rows[rows.length-1].push(cur);
+  return rows.filter(r => r.some(c => c.trim()));
+}
+
 async function loadData() {
   try {
-    const res = await fetch(BASE_URL + '&t=' + Date.now());
+    const res = await fetch(CSV_URL + '&t=' + Date.now());
     const text = await res.text();
-    const json = JSON.parse(text.replace(/^[^(]+\(/, '').replace(/\);?\s*$/, ''));
-    const rows = json.table.rows;
-    allRestos = rows.map((row, i) => ({
+    const rows = parseCSV(text);
+    allRestos = rows.slice(1).map((row, i) => ({
       row: i + 2,
-      nom: getCellValue(row, 0),
-      adresse: getCellValue(row, 1),
-      tel: getCellValue(row, 2),
-      cuisine: getCellValue(row, 3),
-      prix: getCellValue(row, 4),
-      commentaire: getCellValue(row, 5),
-      ambiance: getCellValue(row, 6),
-    })).filter(r => r.nom && r.nom.trim());
+      nom: (row[0] || '').trim(),
+      adresse: (row[1] || '').trim(),
+      tel: (row[2] || '').trim(),
+      cuisine: (row[3] || '').trim(),
+      prix: (row[4] || '').trim(),
+      commentaire: (row[5] || '').trim(),
+      ambiance: (row[6] || '').trim(),
+    })).filter(r => r.nom);
     filterRestos();
   } catch(e) {
     document.getElementById('list-view').innerHTML = `
@@ -616,10 +632,6 @@ async function loadData() {
         <p>Impossible de charger les données.<br>Vérifie ta connexion.</p>
       </div>`;
   }
-}
-
-function getCellValue(row, col) {
-  return row.c && row.c[col] && row.c[col].v != null ? String(row.c[col].v).trim() : '';
 }
 
 function filterRestos() {
@@ -783,24 +795,25 @@ async function submitForm(e) {
 }
 
 async function appendRow(values) {
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/values/${SHEET_NAME}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
-  const res = await fetch(url, {
+  if (!window.APPS_SCRIPT_URL) throw new Error('No script URL');
+  const res = await fetch(window.APPS_SCRIPT_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ values: [values] })
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({ action: 'append', values })
   });
-  if (!res.ok) throw new Error('Write failed');
+  const data = await res.json();
+  if (data.status !== 'ok') throw new Error('Write failed');
 }
 
 async function writeRow(row, values) {
-  const range = `${SHEET_NAME}!A${row}:G${row}`;
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/values/${range}?valueInputOption=USER_ENTERED`;
-  const res = await fetch(url, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ values: [values] })
+  if (!window.APPS_SCRIPT_URL) throw new Error('No script URL');
+  const res = await fetch(window.APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({ action: 'update', row, values })
   });
-  if (!res.ok) throw new Error('Update failed');
+  const data = await res.json();
+  if (data.status !== 'ok') throw new Error('Update failed');
 }
 
 function switchTab(tab, el) {
