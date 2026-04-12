@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#1a1a2e">
+<meta name="theme-color" content="#C0392B">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Restos Marseille">
@@ -15,16 +15,16 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   :root {
-    --accent: #E8533A;
-    --accent2: #F2A65A;
-    --dark: #0f0f1a;
-    --dark2: #1a1a2e;
-    --dark3: #252540;
-    --card: #1e1e35;
-    --text: #f0ede8;
-    --muted: #8888aa;
-    --border: rgba(255,255,255,0.08);
-    --success: #4ecb71;
+    --accent: #C0392B;
+    --accent2: #E67E22;
+    --dark: #f5f5f5;
+    --dark2: #ffffff;
+    --dark3: #f0f0f0;
+    --card: #ffffff;
+    --text: #1a1a1a;
+    --muted: #888888;
+    --border: rgba(0,0,0,0.10);
+    --success: #27ae60;
     --radius: 16px;
     --radius-sm: 10px;
   }
@@ -180,6 +180,7 @@
     transition: transform 0.2s, border-color 0.2s;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
   }
   .resto-card::before {
     content: '';
@@ -637,7 +638,11 @@ async function loadData() {
 function filterRestos() {
   const search = document.getElementById('search').value.toLowerCase();
   filtered = allRestos.filter(r => {
-    const matchFilter = currentFilter === 'all' || (r.prix && r.prix.toLowerCase().includes(currentFilter.toLowerCase()));
+    const matchFilter = currentFilter === 'all' || (r.prix && (
+      currentFilter === 'Cher'
+        ? r.prix.toLowerCase() === 'cher' || r.prix.toLowerCase().startsWith('cher ')
+        : r.prix.toLowerCase().includes(currentFilter.toLowerCase())
+    ));
     const matchSearch = !search ||
       r.nom.toLowerCase().includes(search) ||
       r.cuisine.toLowerCase().includes(search) ||
@@ -833,7 +838,7 @@ function switchTab(tab, el) {
 function initMap() {
   if (!mapInitialized) {
     map = L.map('map').setView([43.2965, 5.3698], 13);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       attribution: '© OpenStreetMap © CARTO',
       maxZoom: 19
     }).addTo(map);
