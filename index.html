@@ -471,7 +471,7 @@
 <body>
 
 <header>
-  <div class="logo">Restos<span>MRS</span></div>
+  <div class="logo"><img src="icon-192.png" style="width:36px;height:36px;border-radius:8px;vertical-align:middle;margin-right:10px;">Restos <span>Marseille</span></div>
   <div class="header-actions">
     <button class="btn-icon" onclick="refreshData()" title="Actualiser">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
@@ -644,7 +644,7 @@ function filterRestos() {
       r.adresse.toLowerCase().includes(search) ||
       r.commentaire.toLowerCase().includes(search);
     return matchFilter && matchSearch;
-  });
+  }).sort((a, b) => a.nom.localeCompare(b.nom, 'fr', {sensitivity: 'base'}));
   renderList();
   updateStats();
   if (currentTab === 'map' && mapInitialized) renderMap();
