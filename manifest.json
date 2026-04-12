@@ -1,8 +1,8 @@
 {
   "name": "Restos Marseille",
-  "short_name": "RestosMRS",
+  "short_name": "Restos Marseille",
   "description": "Notre carnet de restaurants marseillais",
-  "start_url": "/index.html",
+  "start_url": "/restos-marseille/index.html",
   "display": "standalone",
   "background_color": "#0f0f1a",
   "theme_color": "#1a1a2e",
@@ -18,5 +18,6 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ]
+  ],
+  "scope": "/restos-marseille/"
 }
