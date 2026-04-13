@@ -71,7 +71,7 @@
 
   .logo {
     font-family: 'BerlinSans', sans-serif;
-    font-weight: 700;
+    font-weight: 400;
     font-size: 26px;
     color: #E8533A;
     letter-spacing: 0.5px;
@@ -478,6 +478,31 @@
   .empty-icon { font-size: 48px; margin-bottom: 12px; }
 
   /* TOAST */
+  #splash {
+    position: fixed;
+    inset: 0;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: opacity 0.5s ease;
+  }
+  #splash img {
+    width: 120px;
+    height: 120px;
+    border-radius: 24px;
+    margin-bottom: 20px;
+  }
+  #splash .credit {
+    font-size: 14px;
+    color: #111111;
+    font-family: 'BerlinSans', sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+  }
+
   .toast {
     position: fixed;
     bottom: 90px; left: 50%;
@@ -499,6 +524,11 @@
 </style>
 </head>
 <body>
+
+<div id="splash">
+  <img src="icon-192.png" alt="Restos Marseille">
+  <div class="credit">Crédit : Carole, Olivier et Claude AI</div>
+</div>
 
 <header>
   <div class="logo"><img src="icon-192.png" style="width:36px;height:36px;border-radius:4px;vertical-align:middle;margin-right:10px;">RESTOS <span>MARSEILLE</span></div>
@@ -831,6 +861,12 @@ async function submitForm(e) {
     }
     closeFormModal();
     await loadData();
+
+setTimeout(() => {
+  const splash = document.getElementById('splash');
+  splash.style.opacity = '0';
+  setTimeout(() => splash.style.display = 'none', 500);
+}, 2000);
   } catch(err) {
     showToast('Erreur lors de la sauvegarde', 'error');
   }
@@ -959,6 +995,12 @@ async function deleteResto(row) {
 function refreshData() {
   document.getElementById('list-view').innerHTML = `<div class="loading"><div class="loading-spinner"></div>Actualisation...</div>`;
   loadData();
+
+setTimeout(() => {
+  const splash = document.getElementById('splash');
+  splash.style.opacity = '0';
+  setTimeout(() => splash.style.display = 'none', 500);
+}, 2000);
 }
 
 function showToast(msg, type = '') {
@@ -973,6 +1015,12 @@ function escHtml(str) {
 }
 
 loadData();
+
+setTimeout(() => {
+  const splash = document.getElementById('splash');
+  splash.style.opacity = '0';
+  setTimeout(() => splash.style.display = 'none', 500);
+}, 2000);
 </script>
 </body>
 </html>
