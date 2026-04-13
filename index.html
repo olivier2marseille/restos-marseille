@@ -72,7 +72,7 @@
   .logo {
     font-family: 'BerlinSans', sans-serif;
     font-weight: 700;
-    font-size: 20px;
+    font-size: 30px;
     color: #E8533A;
     letter-spacing: 0.5px;
     flex: 1;
@@ -255,10 +255,10 @@
 
   .card-comment {
     font-size: 13px;
-    color: rgba(240,237,232,0.75);
+    color: #333333;
     line-height: 1.5;
     font-style: italic;
-    border-left: 2px solid var(--dark3);
+    border-left: 2px solid #dddddd;
     padding-left: 10px;
     margin-bottom: 8px;
   }
@@ -405,7 +405,7 @@
     margin-bottom: 4px;
     font-weight: 600;
   }
-  .detail-value { font-size: 15px; color: var(--text); line-height: 1.5; }
+  .detail-value { font-size: 15px; color: #111111; line-height: 1.5; font-weight: 400; }
 
   .detail-actions {
     display: flex;
@@ -601,7 +601,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4Iq-_SlIFZSRFPEZPowXAV9ORzB1pP3ph3O7_tHehfunXNDvNShNat4fCnU_CfBB0/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxNFzZKtMnHtsG37L8AVmLnzO4upi54YxgVZ2xZv91go-jANFwrKRq3M4HRRfm9hEIE/exec';
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTckUrM9P6FBveNU_PGqx-ASv7MekyJRWEtSpRnapfsUNQ3JmygYt_pS77Ek48pLdEDYpNNpMG4uIu8/pub?gid=437654541&single=true&output=csv';
 const SHEET_ID = '1tgboSBfdyyHw8IbDhtwOzjZR8DBGIAYmTcQv8UIv5FM';
 const SHEET_NAME = 'Sheet1';
@@ -829,21 +829,19 @@ async function submitForm(e) {
 async function appendRow(values) {
   const res = await fetch(APPS_SCRIPT_URL, {
     method: 'POST',
+    mode: 'no-cors',
     headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify({ action: 'append', values })
   });
-  const data = await res.json();
-  if (data.status !== 'ok') throw new Error('Write failed');
 }
 
 async function writeRow(row, values) {
   const res = await fetch(APPS_SCRIPT_URL, {
     method: 'POST',
+    mode: 'no-cors',
     headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify({ action: 'update', row, values })
   });
-  const data = await res.json();
-  if (data.status !== 'ok') throw new Error('Update failed');
 }
 
 function switchTab(tab, el) {
