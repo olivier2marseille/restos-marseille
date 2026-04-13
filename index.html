@@ -72,7 +72,7 @@
   .logo {
     font-family: 'BerlinSans', sans-serif;
     font-weight: 700;
-    font-size: 30px;
+    font-size: 26px;
     color: #E8533A;
     letter-spacing: 0.5px;
     flex: 1;
@@ -424,6 +424,18 @@
     cursor: pointer;
     text-align: center;
   }
+  .btn-delete {
+    flex: 1;
+    padding: 12px;
+    background: rgba(192,57,43,0.08);
+    border: 1px solid rgba(192,57,43,0.2);
+    border-radius: var(--radius-sm);
+    color: #C0392B;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+  }
   .btn-call {
     flex: 1;
     padding: 12px;
@@ -601,7 +613,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxNFzZKtMnHtsG37L8AVmLnzO4upi54YxgVZ2xZv91go-jANFwrKRq3M4HRRfm9hEIE/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4NCdObTExbrfhDz63IpmZUSWiON3c0bYXGukE-J2sc9KbRGOAGkVrIOdT-ARXUrNi/exec';
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTckUrM9P6FBveNU_PGqx-ASv7MekyJRWEtSpRnapfsUNQ3JmygYt_pS77Ek48pLdEDYpNNpMG4uIu8/pub?gid=437654541&single=true&output=csv';
 const SHEET_ID = '1tgboSBfdyyHw8IbDhtwOzjZR8DBGIAYmTcQv8UIv5FM';
 const SHEET_NAME = 'Sheet1';
@@ -746,6 +758,7 @@ function openDetail(row) {
       <button class="btn-edit" onclick="openEditModal(${row})">✏️ Modifier</button>
       ${r.tel ? `<a href="tel:${r.tel}" class="btn-call">📞 ${escHtml(r.tel)}</a>` : ''}
     </div>
+    <button class="btn-delete" style="width:100%;margin-top:10px;" onclick="confirmDelete(${row}, '${escHtml(r.nom)}')">🗑️ Supprimer ce restaurant</button>
   `;
   document.getElementById('detail-overlay').classList.add('open');
 }
@@ -919,6 +932,28 @@ async function renderMap() {
       `)
       .addTo(map);
   });
+}
+
+function confirmDelete(row, nom) {
+  if (confirm(`Supprimer "${nom}" ?\nCette action est irréversible.`)) {
+    deleteResto(row);
+  }
+}
+
+async function deleteResto(row) {
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'delete', row })
+    });
+    document.getElementById('detail-overlay').classList.remove('open');
+    showToast('Restaurant supprimé !', 'success');
+    setTimeout(() => loadData(), 1500);
+  } catch(err) {
+    showToast('Erreur lors de la suppression', 'error');
+  }
 }
 
 function refreshData() {
