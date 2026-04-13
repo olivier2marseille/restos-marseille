@@ -26,6 +26,7 @@
   font-weight: 700;
 }
 </style>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
@@ -218,7 +219,7 @@
   }
 
   .card-name {
-    font-family: 'BerlinSans', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-weight: 700;
     font-size: 17px;
     color: #E8533A;
@@ -339,11 +340,11 @@
   .form-label {
     display: block;
     font-size: 12px;
-    color: var(--muted);
+    color: #111111;
     text-transform: uppercase;
     letter-spacing: 0.8px;
     margin-bottom: 6px;
-    font-weight: 500;
+    font-weight: 600;
   }
   .form-input {
     width: 100%;
@@ -398,10 +399,11 @@
   .detail-section { margin-top: 20px; }
   .detail-label {
     font-size: 11px;
-    color: var(--muted);
+    color: #111111;
     text-transform: uppercase;
     letter-spacing: 0.8px;
     margin-bottom: 4px;
+    font-weight: 600;
   }
   .detail-value { font-size: 15px; color: var(--text); line-height: 1.5; }
 
@@ -487,7 +489,7 @@
 <body>
 
 <header>
-  <div class="logo"><img src="icon-192.png" style="width:36px;height:36px;border-radius:4px;vertical-align:middle;margin-right:10px;">Restos <span>Marseille</span></div>
+  <div class="logo"><img src="icon-192.png" style="width:36px;height:36px;border-radius:4px;vertical-align:middle;margin-right:10px;">RESTOS <span>MARSEILLE</span></div>
   <div class="header-actions">
     <button class="btn-icon" onclick="refreshData()" title="Actualiser">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
@@ -599,6 +601,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4Iq-_SlIFZSRFPEZPowXAV9ORzB1pP3ph3O7_tHehfunXNDvNShNat4fCnU_CfBB0/exec';
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTckUrM9P6FBveNU_PGqx-ASv7MekyJRWEtSpRnapfsUNQ3JmygYt_pS77Ek48pLdEDYpNNpMG4uIu8/pub?gid=437654541&single=true&output=csv';
 const SHEET_ID = '1tgboSBfdyyHw8IbDhtwOzjZR8DBGIAYmTcQv8UIv5FM';
 const SHEET_NAME = 'Sheet1';
@@ -824,8 +827,7 @@ async function submitForm(e) {
 }
 
 async function appendRow(values) {
-  if (!window.APPS_SCRIPT_URL) throw new Error('No script URL');
-  const res = await fetch(window.APPS_SCRIPT_URL, {
+  const res = await fetch(APPS_SCRIPT_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify({ action: 'append', values })
@@ -835,8 +837,7 @@ async function appendRow(values) {
 }
 
 async function writeRow(row, values) {
-  if (!window.APPS_SCRIPT_URL) throw new Error('No script URL');
-  const res = await fetch(window.APPS_SCRIPT_URL, {
+  const res = await fetch(APPS_SCRIPT_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify({ action: 'update', row, values })
