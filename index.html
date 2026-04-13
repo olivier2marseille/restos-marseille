@@ -481,7 +481,7 @@
   #splash {
     position: fixed;
     inset: 0;
-    background: #ffffff;
+    background: #111111;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -497,7 +497,7 @@
   }
   #splash .credit {
     font-size: 14px;
-    color: #111111;
+    color: #ffffff;
     font-family: 'BerlinSans', sans-serif;
     font-weight: 400;
     letter-spacing: 0.3px;
@@ -866,7 +866,7 @@ setTimeout(() => {
   const splash = document.getElementById('splash');
   splash.style.opacity = '0';
   setTimeout(() => splash.style.display = 'none', 500);
-}, 2000);
+}, 4000);
   } catch(err) {
     showToast('Erreur lors de la sauvegarde', 'error');
   }
@@ -1000,7 +1000,7 @@ setTimeout(() => {
   const splash = document.getElementById('splash');
   splash.style.opacity = '0';
   setTimeout(() => splash.style.display = 'none', 500);
-}, 2000);
+}, 4000);
 }
 
 function showToast(msg, type = '') {
@@ -1020,7 +1020,7 @@ setTimeout(() => {
   const splash = document.getElementById('splash');
   splash.style.opacity = '0';
   setTimeout(() => splash.style.display = 'none', 500);
-}, 2000);
+}, 4000);
 </script>
 </body>
 </html>
