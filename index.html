@@ -78,7 +78,7 @@
     flex: 1;
   }
 
-  .logo span { color: #111111; }
+  .logo span { color: #111111; font-size: 25px; font-weight: 400; }
 
   .header-actions { display: flex; gap: 10px; }
 
@@ -150,6 +150,9 @@
     border-color: var(--accent);
     color: white;
   }
+  .filter-btn.active[data-filter="Pas Cher"] { background: #4ecb71; border-color: #4ecb71; color: white; }
+  .filter-btn.active[data-filter="Correct"] { background: #F2A65A; border-color: #F2A65A; color: white; }
+  .filter-btn.active[data-filter="Cher"] { background: #E8533A; border-color: #E8533A; color: white; }
 
   /* TABS */
   .tabs {
@@ -239,13 +242,13 @@
   .price-default { background: var(--dark3); color: var(--muted); border: 1px solid var(--border); }
 
   .card-cuisine {
-    font-size: 13px;
+    font-size: 15px;
     color: var(--muted);
     margin-bottom: 6px;
   }
 
   .card-address {
-    font-size: 12px;
+    font-size: 14px;
     color: var(--muted);
     margin-bottom: 10px;
     display: flex;
@@ -254,7 +257,7 @@
   }
 
   .card-comment {
-    font-size: 13px;
+    font-size: 15px;
     color: #333333;
     line-height: 1.5;
     font-style: italic;
@@ -264,7 +267,7 @@
   }
 
   .card-ambiance {
-    font-size: 12px;
+    font-size: 14px;
     color: var(--muted);
     display: flex;
     align-items: center;
@@ -398,14 +401,14 @@
   .detail-modal .card-name { font-size: 22px; margin-bottom: 6px; }
   .detail-section { margin-top: 20px; }
   .detail-label {
-    font-size: 11px;
+    font-size: 13px;
     color: #111111;
     text-transform: uppercase;
     letter-spacing: 0.8px;
     margin-bottom: 4px;
     font-weight: 600;
   }
-  .detail-value { font-size: 15px; color: #111111; line-height: 1.5; font-weight: 400; }
+  .detail-value { font-size: 17px; color: #111111; line-height: 1.5; font-weight: 400; }
 
   .detail-actions {
     display: flex;
@@ -490,13 +493,13 @@
     transition: opacity 0.5s ease;
   }
   #splash img {
-    width: 120px;
-    height: 120px;
-    border-radius: 24px;
-    margin-bottom: 20px;
+    width: 160px;
+    height: 160px;
+    border-radius: 32px;
+    margin-bottom: 24px;
   }
   #splash .credit {
-    font-size: 14px;
+    font-size: 18px;
     color: #ffffff;
     font-family: 'BerlinSans', sans-serif;
     font-weight: 400;
@@ -529,7 +532,7 @@
 
 <div id="splash">
   <img src="icon-192.png" alt="Restos Marseille">
-  <div class="credit">Cuisiné pour vous par :<br>Carole, Olivier et Claude AI</div>
+  <div class="credit">Créé par Carole<br>Cuisiné par Olivier et Claude AI</div>
 </div>
 
 <header>
@@ -547,10 +550,10 @@
 </div>
 
 <div class="filters" id="filters">
-  <button class="filter-btn active" onclick="setFilter('all', this)">Tous</button>
-  <button class="filter-btn" onclick="setFilter('Pas Cher', this)">Pas cher</button>
-  <button class="filter-btn" onclick="setFilter('Correct', this)">Correct</button>
-  <button class="filter-btn" onclick="setFilter('Cher', this)">Cher</button>
+  <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">Tous</button>
+  <button class="filter-btn" data-filter="Pas Cher" onclick="setFilter('Pas Cher', this)">Pas cher</button>
+  <button class="filter-btn" data-filter="Correct" onclick="setFilter('Correct', this)">Correct</button>
+  <button class="filter-btn" data-filter="Cher" onclick="setFilter('Cher', this)">Cher</button>
 </div>
 
 <div class="tabs">
@@ -756,7 +759,7 @@ function renderList() {
         ${r.prix ? `<span class="price-badge ${getPriceBadgeClass(r.prix)}">${escHtml(r.prix)}</span>` : ''}
       </div>
       ${r.cuisine ? `<div class="card-cuisine">🍴 ${escHtml(r.cuisine)}</div>` : ''}
-      ${r.adresse ? `<div class="card-address">📍 ${escHtml(r.adresse)}</div>` : ''}
+      ${r.adresse ? `<div class="card-address">📍 <a href="https://www.google.com/maps/search/${encodeURIComponent(r.adresse + ', Marseille')}" target="_blank" style="color:#111111;text-decoration:underline;">${escHtml(r.adresse)}</a></div>` : ''}
       ${r.commentaire ? `<div class="card-comment">${escHtml(r.commentaire.substring(0, 120))}${r.commentaire.length > 120 ? '…' : ''}</div>` : ''}
       ${r.ambiance ? `<div class="card-ambiance">✨ ${escHtml(r.ambiance)}</div>` : ''}
       ${r.ajoutePar ? `<div class="card-ambiance" style="margin-top:4px;">👤 ${escHtml(r.ajoutePar)}</div>` : ''}
@@ -774,7 +777,7 @@ function openDetail(row) {
       ${r.prix ? `<span class="price-badge ${getPriceBadgeClass(r.prix)}">${escHtml(r.prix)}</span>` : ''}
     </div>
     ${r.cuisine ? `<div class="card-cuisine" style="margin-bottom:4px">🍴 ${escHtml(r.cuisine)}</div>` : ''}
-    ${r.adresse ? `<div class="card-address">📍 ${escHtml(r.adresse)}</div>` : ''}
+    ${r.adresse ? `<div class="card-address">📍 <a href="https://www.google.com/maps/search/${encodeURIComponent(r.adresse + ', Marseille')}" target="_blank" style="color:#111111;text-decoration:underline;">${escHtml(r.adresse)}</a></div>` : ''}
     ${r.commentaire ? `
       <div class="detail-section">
         <div class="detail-label">Avis</div>
