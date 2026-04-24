@@ -574,7 +574,7 @@
 </div>
 
 <div class="filters" id="category-filters" style="margin-top:10px;">
-  <button class="filter-btn" data-filter="Nouveau" onclick="toggleCategoryFilter('Nouveau', this)">🟢 Nouveau</button>
+  <button class="filter-btn" data-filter="Nouveau" onclick="toggleCategoryFilter('Nouveau', this)">🟡 Nouveau</button>
   <button class="filter-btn" data-filter="A Tester" onclick="toggleCategoryFilter('A Tester', this)">🟡 A Tester</button>
   <button class="filter-btn" data-filter="A Fuir" onclick="toggleCategoryFilter('A Fuir', this)">🔴 A Fuir</button>
 </div>
@@ -748,8 +748,16 @@ function filterRestos() {
         ? r.prix.toLowerCase() === 'cher' || r.prix.toLowerCase().startsWith('cher ')
         : r.prix.toLowerCase().includes(currentFilter.toLowerCase())
     ));
-    const matchCategoryFilter = currentCategoryFilter === 'all-cat' || 
-      (r.categorie && r.categorie === currentCategoryFilter);
+    
+    let matchCategoryFilter = true;
+    if (currentCategoryFilter === 'all-cat') {
+      matchCategoryFilter = true;
+    } else if (currentCategoryFilter === 'Nouveau') {
+      matchCategoryFilter = isNewResto(r.dateCreation);
+    } else {
+      matchCategoryFilter = r.categorie && r.categorie === currentCategoryFilter;
+    }
+    
     const matchSearch = !search ||
       r.nom.toLowerCase().includes(search) ||
       r.cuisine.toLowerCase().includes(search) ||
@@ -828,10 +836,9 @@ function renderList() {
     return;
   }
   el.innerHTML = filtered.map(r => `
-    <div class="resto-card" onclick="openDetail(${r.row})">
+    <div class="resto-card" style="${isNewResto(r.dateCreation) ? 'background: rgba(255, 193, 7, 0.1);' : ''}" onclick="openDetail(${r.row})">
       <div class="card-header">
         <div class="card-name">${escHtml(r.nom)}</div>
-        ${isNewResto(r.dateCreation) ? `<span class="category-badge" style="background: rgba(255, 193, 7, 0.15); color: #f57f17; border: 1px solid rgba(255, 193, 7, 0.3);">🟡 Nouveau</span>` : ''}
         ${r.categorie ? `<span class="category-badge ${getCategoryBadgeClass(r.categorie)}">${escHtml(r.categorie)}</span>` : ''}
         ${r.prix ? `<span class="price-badge ${getPriceBadgeClass(r.prix)}">${escHtml(r.prix)}</span>` : ''}
       </div>
@@ -851,7 +858,6 @@ function openDetail(row) {
   content.innerHTML = `
     <div class="card-header">
       <div class="card-name">${escHtml(r.nom)}</div>
-      ${isNewResto(r.dateCreation) ? `<span class="category-badge" style="background: rgba(255, 193, 7, 0.15); color: #f57f17; border: 1px solid rgba(255, 193, 7, 0.3);">🟡 Nouveau</span>` : ''}
       ${r.categorie ? `<span class="category-badge ${getCategoryBadgeClass(r.categorie)}">${escHtml(r.categorie)}</span>` : ''}
       ${r.prix ? `<span class="price-badge ${getPriceBadgeClass(r.prix)}">${escHtml(r.prix)}</span>` : ''}
     </div>
