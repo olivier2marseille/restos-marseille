@@ -721,8 +721,8 @@ async function loadData() {
     allRestos = rows.slice(1).map((row, i) => ({
       row: i + 2,
       nom: (row[0] || '').trim(),
-      categorie: (row[1] || '').trim(),
-      adresse: (row[2] || '').trim(),
+      adresse: (row[1] || '').trim(),
+      categorie: (row[2] || '').trim(),
       tel: (row[3] || '').trim(),
       cuisine: (row[4] || '').trim(),
       prix: (row[5] || '').trim(),
@@ -910,8 +910,8 @@ async function submitForm(e) {
 
   const values = [
     document.getElementById('f-nom').value,
-    document.getElementById('f-categorie').value,
     document.getElementById('f-adresse').value,
+    document.getElementById('f-categorie').value,
     document.getElementById('f-tel').value,
     document.getElementById('f-cuisine').value,
     document.getElementById('f-prix').value,
