@@ -931,6 +931,13 @@ async function submitForm(e) {
   btn.disabled = true;
   btn.textContent = 'Enregistrement...';
 
+  const today = new Date();
+  const dateStr = String(today.getDate()).padStart(2, '0') + '/' + 
+                  String(today.getMonth() + 1).padStart(2, '0') + '/' + 
+                  today.getFullYear();
+
+  console.log('Date générée:', dateStr);
+
   const values = [
     document.getElementById('f-nom').value,
     document.getElementById('f-adresse').value,
@@ -941,7 +948,10 @@ async function submitForm(e) {
     document.getElementById('f-commentaire').value,
     document.getElementById('f-ambiance').value,
     document.getElementById('f-ajoute-par').value,
+    dateStr,
   ];
+
+  console.log('Values à envoyer:', values);
 
   try {
     if (editingRow) {
@@ -960,6 +970,7 @@ setTimeout(() => {
   setTimeout(() => splash.style.display = 'none', 500);
 }, 3000);
   } catch(err) {
+    console.error('Erreur:', err);
     showToast('Erreur lors de la sauvegarde', 'error');
   }
 
