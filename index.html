@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#C0392B">
+<meta name="theme-color" content="#ffffff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Restos Marseille">
@@ -243,6 +243,19 @@
   .price-cher { background: rgba(232,83,58,0.15); color: var(--accent); border: 1px solid rgba(232,83,58,0.2); }
   .price-default { background: var(--dark3); color: var(--muted); border: 1px solid var(--border); }
   .price-tres-cher { background: rgba(224,11,46,0.12); color: #a41129; border: 1px solid rgba(224,11,46,0.25); }
+
+  /* CATEGORY BADGES */
+  .category-badge {
+    flex-shrink: 0;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-left: 6px;
+  }
+  .category-nouveau { background: rgba(78,203,113,0.15); color: #2d8a47; border: 1px solid rgba(78,203,113,0.3); }
+  .category-a-tester { background: rgba(242,166,90,0.15); color: #d87d1e; border: 1px solid rgba(242,166,90,0.3); }
+  .category-a-fuir { background: rgba(232,83,58,0.15); color: #c03a1d; border: 1px solid rgba(232,83,58,0.3); }
 
   .card-cuisine {
     font-size: 15px;
@@ -560,6 +573,12 @@
   <button class="filter-btn" data-filter="Très cher" onclick="setFilter('Très cher', this)">Très cher</button>
 </div>
 
+<div class="filters" id="category-filters" style="margin-top:10px;">
+  <button class="filter-btn" data-filter="Nouveau" onclick="toggleCategoryFilter('Nouveau', this)">🟢 Nouveau</button>
+  <button class="filter-btn" data-filter="A Tester" onclick="toggleCategoryFilter('A Tester', this)">🟡 A Tester</button>
+  <button class="filter-btn" data-filter="A Fuir" onclick="toggleCategoryFilter('A Fuir', this)">🔴 A Fuir</button>
+</div>
+
 <div class="tabs">
   <div class="tab active" onclick="switchTab('list', this)">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
@@ -605,6 +624,15 @@
       <div class="form-group">
         <label class="form-label">Nom du restaurant *</label>
         <input type="text" class="form-input" id="f-nom" placeholder="Ex: Chez Marcel" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Catégorie *</label>
+        <select class="form-input" id="f-categorie" required>
+          <option value="">-- Choisir --</option>
+          <option value="Nouveau">🟢 Nouveau</option>
+          <option value="A Tester">🟡 A Tester</option>
+          <option value="A Fuir">🔴 A Fuir</option>
+        </select>
       </div>
       <div class="form-group">
         <label class="form-label">Adresse</label>
@@ -661,6 +689,7 @@ const SHEET_NAME = 'Sheet1';
 let allRestos = [];
 let filtered = [];
 let currentFilter = 'all';
+let currentCategoryFilter = 'all-cat';
 let editingRow = null;
 let map = null;
 let mapInitialized = false;
@@ -692,13 +721,14 @@ async function loadData() {
     allRestos = rows.slice(1).map((row, i) => ({
       row: i + 2,
       nom: (row[0] || '').trim(),
-      adresse: (row[1] || '').trim(),
-      tel: (row[2] || '').trim(),
-      cuisine: (row[3] || '').trim(),
-      prix: (row[4] || '').trim(),
-      commentaire: (row[5] || '').trim(),
-      ambiance: (row[6] || '').trim(),
-      ajoutePar: (row[7] || '').trim(),
+      categorie: (row[1] || '').trim(),
+      adresse: (row[2] || '').trim(),
+      tel: (row[3] || '').trim(),
+      cuisine: (row[4] || '').trim(),
+      prix: (row[5] || '').trim(),
+      commentaire: (row[6] || '').trim(),
+      ambiance: (row[7] || '').trim(),
+      ajoutePar: (row[8] || '').trim(),
     })).filter(r => r.nom);
     filterRestos();
   } catch(e) {
@@ -713,17 +743,19 @@ async function loadData() {
 function filterRestos() {
   const search = document.getElementById('search').value.toLowerCase();
   filtered = allRestos.filter(r => {
-    const matchFilter = currentFilter === 'all' || (r.prix && (
+    const matchPriceFilter = currentFilter === 'all' || (r.prix && (
       currentFilter === 'Cher'
         ? r.prix.toLowerCase() === 'cher' || r.prix.toLowerCase().startsWith('cher ')
         : r.prix.toLowerCase().includes(currentFilter.toLowerCase())
     ));
+    const matchCategoryFilter = currentCategoryFilter === 'all-cat' || 
+      (r.categorie && r.categorie === currentCategoryFilter);
     const matchSearch = !search ||
       r.nom.toLowerCase().includes(search) ||
       r.cuisine.toLowerCase().includes(search) ||
       r.adresse.toLowerCase().includes(search) ||
       r.commentaire.toLowerCase().includes(search);
-    return matchFilter && matchSearch;
+    return matchPriceFilter && matchCategoryFilter && matchSearch;
   }).sort((a, b) => a.nom.localeCompare(b.nom, 'fr', {sensitivity: 'base'}));
   renderList();
   updateStats();
@@ -732,8 +764,22 @@ function filterRestos() {
 
 function setFilter(filter, btn) {
   currentFilter = filter;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#filters .filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  filterRestos();
+}
+
+function toggleCategoryFilter(filter, btn) {
+  // Si le bouton cliqué est déjà actif, on le désactive (retour à 'all-cat')
+  if (currentCategoryFilter === filter) {
+    currentCategoryFilter = 'all-cat';
+    btn.classList.remove('active');
+  } else {
+    // Sinon on active le nouveau filtre et désactive les autres
+    currentCategoryFilter = filter;
+    document.querySelectorAll('#category-filters .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
   filterRestos();
 }
 
@@ -752,6 +798,14 @@ function getPriceBadgeClass(prix) {
   return 'price-default';
 }
 
+function getCategoryBadgeClass(categorie) {
+  if (!categorie) return '';
+  if (categorie === 'Nouveau') return 'category-nouveau';
+  if (categorie === 'A Tester') return 'category-a-tester';
+  if (categorie === 'A Fuir') return 'category-a-fuir';
+  return '';
+}
+
 function renderList() {
   const el = document.getElementById('list-view');
   if (!filtered.length) {
@@ -762,6 +816,7 @@ function renderList() {
     <div class="resto-card" onclick="openDetail(${r.row})">
       <div class="card-header">
         <div class="card-name">${escHtml(r.nom)}</div>
+        ${r.categorie ? `<span class="category-badge ${getCategoryBadgeClass(r.categorie)}">${escHtml(r.categorie)}</span>` : ''}
         ${r.prix ? `<span class="price-badge ${getPriceBadgeClass(r.prix)}">${escHtml(r.prix)}</span>` : ''}
       </div>
       ${r.cuisine ? `<div class="card-cuisine">🍴 ${escHtml(r.cuisine)}</div>` : ''}
@@ -780,6 +835,7 @@ function openDetail(row) {
   content.innerHTML = `
     <div class="card-header">
       <div class="card-name">${escHtml(r.nom)}</div>
+      ${r.categorie ? `<span class="category-badge ${getCategoryBadgeClass(r.categorie)}">${escHtml(r.categorie)}</span>` : ''}
       ${r.prix ? `<span class="price-badge ${getPriceBadgeClass(r.prix)}">${escHtml(r.prix)}</span>` : ''}
     </div>
     ${r.cuisine ? `<div class="card-cuisine" style="margin-bottom:4px">🍴 ${escHtml(r.cuisine)}</div>` : ''}
@@ -826,6 +882,7 @@ function openEditModal(row) {
   document.getElementById('form-title').textContent = 'Modifier le restaurant';
   document.getElementById('submit-btn').textContent = 'Enregistrer';
   document.getElementById('f-nom').value = r.nom;
+  document.getElementById('f-categorie').value = r.categorie;
   document.getElementById('f-adresse').value = r.adresse;
   document.getElementById('f-tel').value = r.tel;
   document.getElementById('f-cuisine').value = r.cuisine;
@@ -853,6 +910,7 @@ async function submitForm(e) {
 
   const values = [
     document.getElementById('f-nom').value,
+    document.getElementById('f-categorie').value,
     document.getElementById('f-adresse').value,
     document.getElementById('f-tel').value,
     document.getElementById('f-cuisine').value,
