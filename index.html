@@ -812,10 +812,11 @@ function isNewResto(dateStr) {
     const [day, month, year] = dateStr.split('/').map(Number);
     const creationDate = new Date(year, month - 1, day);
     const today = new Date();
-    const diffTime = today - creationDate;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffTime = Math.abs(today - creationDate);
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     return diffDays <= 7;
   } catch (e) {
+    console.error('Erreur parsing date:', dateStr, e);
     return false;
   }
 }
