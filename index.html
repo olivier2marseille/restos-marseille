@@ -626,10 +626,9 @@
         <input type="text" class="form-input" id="f-nom" placeholder="Ex: Chez Marcel" required>
       </div>
       <div class="form-group" id="categorie-field">
-        <label class="form-label">Catégorie *</label>
-        <select class="form-input" id="f-categorie" required>
-          <option value="">-- Choisir --</option>
-          <option value="Nouveau">🟢 Nouveau</option>
+        <label class="form-label">Catégorie (optionnel)</label>
+        <select class="form-input" id="f-categorie">
+          <option value="">-- Aucune --</option>
           <option value="A Tester">🟡 A Tester</option>
           <option value="A Fuir">🔴 A Fuir</option>
         </select>
@@ -729,6 +728,7 @@ async function loadData() {
       commentaire: (row[6] || '').trim(),
       ambiance: (row[7] || '').trim(),
       ajoutePar: (row[8] || '').trim(),
+      dateCreation: (row[9] || '').trim(),
     })).filter(r => r.nom);
     filterRestos();
   } catch(e) {
@@ -806,6 +806,20 @@ function getCategoryBadgeClass(categorie) {
   return '';
 }
 
+function isNewResto(dateStr) {
+  if (!dateStr) return false;
+  try {
+    const [day, month, year] = dateStr.split('/').map(Number);
+    const creationDate = new Date(year, month - 1, day);
+    const today = new Date();
+    const diffTime = today - creationDate;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays <= 7;
+  } catch (e) {
+    return false;
+  }
+}
+
 function renderList() {
   const el = document.getElementById('list-view');
   if (!filtered.length) {
@@ -816,6 +830,7 @@ function renderList() {
     <div class="resto-card" onclick="openDetail(${r.row})">
       <div class="card-header">
         <div class="card-name">${escHtml(r.nom)}</div>
+        ${isNewResto(r.dateCreation) ? `<span class="category-badge" style="background: rgba(255, 193, 7, 0.15); color: #f57f17; border: 1px solid rgba(255, 193, 7, 0.3);">🟡 Nouveau</span>` : ''}
         ${r.categorie ? `<span class="category-badge ${getCategoryBadgeClass(r.categorie)}">${escHtml(r.categorie)}</span>` : ''}
         ${r.prix ? `<span class="price-badge ${getPriceBadgeClass(r.prix)}">${escHtml(r.prix)}</span>` : ''}
       </div>
@@ -835,6 +850,7 @@ function openDetail(row) {
   content.innerHTML = `
     <div class="card-header">
       <div class="card-name">${escHtml(r.nom)}</div>
+      ${isNewResto(r.dateCreation) ? `<span class="category-badge" style="background: rgba(255, 193, 7, 0.15); color: #f57f17; border: 1px solid rgba(255, 193, 7, 0.3);">🟡 Nouveau</span>` : ''}
       ${r.categorie ? `<span class="category-badge ${getCategoryBadgeClass(r.categorie)}">${escHtml(r.categorie)}</span>` : ''}
       ${r.prix ? `<span class="price-badge ${getPriceBadgeClass(r.prix)}">${escHtml(r.prix)}</span>` : ''}
     </div>
@@ -871,7 +887,6 @@ function openAddModal() {
   document.getElementById('form-title').textContent = 'Ajouter un restaurant';
   document.getElementById('submit-btn').textContent = 'Ajouter';
   document.getElementById('resto-form').reset();
-  document.getElementById('f-categorie').value = 'Nouveau';
   document.getElementById('form-overlay').classList.add('open');
 }
 
