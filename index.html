@@ -743,7 +743,7 @@ async function loadData() {
 
 function showContributors() {
   const counts = {};
-  restos.forEach(r => {
+  allRestos.forEach(r => {
     const name = (r.ajoutePar || '').trim();
     if (name) counts[name] = (counts[name] || 0) + 1;
   });
@@ -773,7 +773,7 @@ function openModal(html) {
     overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
     document.body.appendChild(overlay);
   }
-  overlay.innerHTML = `<div style="background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.2);max-width:90vw;max-height:80vh;overflow-y:auto;">
+  overlay.innerHTML = `<div style="position:relative;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.2);max-width:90vw;max-height:80vh;overflow-y:auto;">
     <button onclick="document.getElementById('modal-overlay').remove()" style="position:absolute;top:8px;right:12px;background:none;border:none;font-size:22px;cursor:pointer;color:#666;">✕</button>
     ${html}
   </div>`;
