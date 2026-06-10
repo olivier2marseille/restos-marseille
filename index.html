@@ -780,6 +780,7 @@ function openModal(html) {
 }
 
 
+function filterRestos() {
   const search = document.getElementById('search').value.toLowerCase();
   filtered = allRestos.filter(r => {
     const matchPriceFilter = currentFilter === 'all' || (r.prix && (
